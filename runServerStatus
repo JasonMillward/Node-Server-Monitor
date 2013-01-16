@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+nohup node serverStatus.node.js > status.out 2>&1&
