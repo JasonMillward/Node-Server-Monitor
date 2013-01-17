@@ -18,24 +18,24 @@
 "use strict";
 
 /**
- *	This is the process title that will be displayed
- *	when viewed under 'ps aux'
+ *  This is the process title that will be displayed
+ *  when viewed under 'ps aux'
  */
 process.title = 'Node Server-Status';
 
 /**
- *	Define the websocket servers port
+ *  Define the websocket servers port
  *
- *	Specify if debug is enabled
+ *  Specify if debug is enabled
  *
- *	Initialise count to be 0
+ *  Initialise count to be 0
  */
-var wSSp  = 1337;
+var wSSp  = 2468;
 var debug = true;
 var count = 0;
 
 /**
- *	Include all of the functions/libs we will be using
+ *  Include all of the functions/libs we will be using
  */
 var sys  = require('util'),
     http = require('http'),
@@ -45,24 +45,24 @@ var sys  = require('util'),
     exec = require("exec-sync");
 
 /**
- *	Define the host and ports (or port scanning)
+ *  Define the host and ports (or port scanning)
  */
 var host = "jCode.me";
 var ports = [
-			['HTTP',	80,		false],
-            ['HTTPS',	443,	false],
-            ['FTP', 	21,		false],
-            ['POP3', 	110,	false],
-            ['SMTP', 	25,		false],
-            ['MySQL', 	3306,	false]
+            ['HTTP',    80,     false],
+            ['HTTPS',   443,    false],
+            ['FTP',     21,     false],
+            ['POP3',    110,    false],
+            ['SMTP',    25,     false],
+            ['MySQL',   3306,   false]
 ];
 
 /**
  * Adds an extra 0 infront of numbers that are
- * 	less then 2 characters in length
+ *  less then 2 characters in length
  *
- * @param	int 	number 	number to pad (if at all)
- * @return 	int
+ * @param   int     number  number to pad (if at all)
+ * @return  int
  */
 function pad2(number) {
      return (number < 10 ? '0' : '') + number
@@ -82,7 +82,7 @@ function scanHosts() {
             var sock = new net.Socket();
             sock.setTimeout(2500);
             sock.on('connect', function() {
-				item[2] = true;
+                item[2] = true;
                 sock.destroy();
             }).on('error',   function(e) {
             }).on('timeout', function(e) {
@@ -99,34 +99,34 @@ function scanHosts() {
  * List drives using df, excluding all temp file systems
  *  Replace all occurances of 2 or more spaces with a single space
  *  Get the drive percentage and mount point and put then in the
- *  	return array
+ *      return array
  *
  * @return array
  */
 function scanDrives () {
-	var retData = [];
-	var df 		= exec("df -ml --exclude-type=tmpfs");
-	var lines 	= df.split("\n");
-	var len 	= lines.length;
+    var retData = [];
+    var df      = exec("df -ml --exclude-type=tmpfs");
+    var lines   = df.split("\n");
+    var len     = lines.length;
 
-	for (var i = 1; i < len; i++) {
-		var line  = lines[i].toLowerCase().replace( /[" "]{2,}/g , ' ');
-		var drive = line.split(" ");
+    for (var i = 1; i < len; i++) {
+        var line  = lines[i].toLowerCase().replace( /[" "]{2,}/g , ' ');
+        var drive = line.split(" ");
 
-		var obj = {
-			percent:    drive[4],
-			mount:  	drive[5]
-		};
-		retData.push(obj);
-	}
-	return retData;
+        var obj = {
+            percent:    drive[4],
+            mount:      drive[5]
+        };
+        retData.push(obj);
+    }
+    return retData;
 }
 
 /**
  * If debug is enabled, log a message to the console
- * 	with the current time.
+ *  with the current time.
  *
- * @param  string 	logStr 	Message to log to the console
+ * @param  string   logStr  Message to log to the console
  */
 function log(logStr) {
     if (debug) {
@@ -230,73 +230,73 @@ var wsServer = new wSS({
 
 wsServer.on('request', function(request) {
 
-	var connection = request.accept(null, request.origin);
-	var oldNetwork = [];
-	var newNetwork = [];
-	var time = getUptime();
-	scanHosts();
-	count++;
+    var connection = request.accept(null, request.origin);
+    var oldNetwork = [];
+    var newNetwork = [];
+    var time = getUptime();
+    scanHosts();
+    count++;
 
 
 
     log('Connection from origin ' + request.origin + '.');
-	log("Peer " + connection.remoteAddress + " connected.");
+    log("Peer " + connection.remoteAddress + " connected.");
 
     if ( count > 5 ) {
         connection.sendUTF(JSON.stringify( { type: 'error', data: 'Too many connections'} ));
-		connection.sendCloseFrame(32001, "Too many connections" ,true);
+        connection.sendCloseFrame(32001, "Too many connections" ,true);
     } else {
-		connection.sendUTF(JSON.stringify( { type: 'uptime', data: time} ));
-	}
+        connection.sendUTF(JSON.stringify( { type: 'uptime', data: time} ));
+    }
 
-	connection.on('message', function(message) {
-		if (message.type === 'utf8') {
+    connection.on('message', function(message) {
+        if (message.type === 'utf8') {
 
-			/**
-			 * [logString description]
-			 */
-			var logString 	= "";
-			var data      	= [];
-			var load      	= getLoad();
-			var CPUs      	= getCPUs();
-			var speed     	= getMHz();
-			var free      	= getMemFree();
-			var total     	= MemTotal();
-			var drives		= scanDrives();
+            /**
+             * [logString description]
+             */
+            var logString   = "";
+            var data        = [];
+            var load        = getLoad();
+            var CPUs        = getCPUs();
+            var speed       = getMHz();
+            var free        = getMemFree();
+            var total       = MemTotal();
+            var drives      = scanDrives();
 
-			/**
-			 * [newNetwork description]
-			 */
-			newNetwork = getNetSpeed();
+            /**
+             * [newNetwork description]
+             */
+            newNetwork = getNetSpeed();
 
-			var tx = newNetwork[0] - oldNetwork[0];
-			var rx = newNetwork[1] - oldNetwork[1];
-			oldNetwork = newNetwork;
+            var tx = newNetwork[0] - oldNetwork[0];
+            var rx = newNetwork[1] - oldNetwork[1];
+            oldNetwork = newNetwork;
 
 
-			/**
-			 * [obj description]
-			 */
-			var obj = {
-				now:        load[0],
-				five:       load[1],
-				fifteen:    load[2],
-				count:      CPUs,
-				MHz:        speed,
-				free:       free,
-				total:      total,
-				drives:     drives,
-				ports:		ports,
-				tx:         tx,
-				rx:         rx
-			};
-			data.push(obj);
+            /**
+             * [obj description]
+             */
+            var obj = {
+                now:        load[0],
+                five:       load[1],
+                fifteen:    load[2],
+                count:      CPUs,
+                MHz:        speed,
+                free:       free,
+                total:      total,
+                drives:     drives,
+                ports:      ports,
+                tx:         tx,
+                rx:         rx
+            };
+            data.push(obj);
 
-			/**
-			 *	Send the client a nice json string from which it can interpret all the data provided
-			 */
-			connection.sendUTF(JSON.stringify( { type: 'message', data: data} ));
-		}
+            /**
+             *  Send the client a nice json string from which it can interpret all the data provided
+             */
+            connection.sendUTF(JSON.stringify( { type: 'message', data: data} ));
+        }
     });
 
     /**
