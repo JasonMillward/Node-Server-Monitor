@@ -21,7 +21,7 @@
  *  This is the process title that will be displayed
  *  when viewed under 'ps aux'
  */
-process.title = 'Node Server-Status';
+process.title = 'Node ServerMonitor';
 
 /**
  *  Define the websocket servers port
@@ -47,14 +47,14 @@ var sys  = require('util'),
 /**
  *  Define the host and ports (or port scanning)
  */
-var host = "jCode.me";
+var host = "92.243.17.170";
 var ports = [
-            ['HTTP',    80,     false],
-            ['HTTPS',   443,    false],
-            ['FTP',     21,     false],
-            ['POP3',    110,    false],
-            ['SMTP',    25,     false],
-            ['MySQL',   3306,   false]
+    ['HTTP',    80,     false],
+    ['HTTPS',   443,    false],
+    ['FTP',     21,     false],
+    ['POP3',    110,    false],
+    ['SMTP',    25,     false],
+    ['MySQL',   3306,   false]
 ];
 
 /**
