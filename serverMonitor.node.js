@@ -37,12 +37,12 @@ var count = 0;
 /**
  *  Include all of the functions/libs we will be using
  */
-var sys  = require('util'),
-    http = require('http'),
-    url  = require('url'),
-    net  = require('net'),
-    wSS  = require('websocket').server,
-    exec = require("exec-sync");
+var sys   = require('util');
+var http  = require('http');
+var url   = require('url');
+var net   = require('net');
+var wSS   = require('websocket').server;
+var esync = require("execSync");
 
 /**
  *  Define the host and ports (or port scanning)
@@ -65,7 +65,7 @@ var ports = [
  * @return  int
  */
 function pad2(number) {
-     return (number < 10 ? '0' : '') + number
+     return (number < 10 ? '0' : '') + number;
 }
 
 /**
@@ -75,7 +75,7 @@ function pad2(number) {
  * @return null
  */
 function scanHosts() {
-    var results
+    var results;
 
     try {
         ports.forEach(function(item) {
@@ -92,7 +92,18 @@ function scanHosts() {
         //console.log(e);
     }
 
-    return
+    return;
+}
+
+
+function exec(str) {
+    var result = esync.exec(str);
+    if (result.code === 0) {
+        return result.stdout;
+    } else {
+        log("Error with command: " + str);
+        return false;
+    }
 }
 
 /**
@@ -130,15 +141,18 @@ function scanDrives () {
  */
 function log(logStr) {
     if (debug) {
-        var currentTime, h, m, s;
+        var currentTime, y, m, d, h, i, s;
 
-        currentTime = new Date;
+        currentTime = new Date();
+        y = pad2(currentTime.getUTCFullYear());
+        m = pad2(currentTime.getMonth());
+        d = pad2(currentTime.getDay());
         h = pad2(currentTime.getHours());
-        m = pad2(currentTime.getMinutes());
+        i = pad2(currentTime.getMinutes());
         s = pad2(currentTime.getSeconds());
 
         try {
-            console.log("[" + h + ":" + m + ":" + s + "]\t" + logStr);
+            console.log("[" + y + "-" + m + "-" + d  + " " + h + ":" + i + ":" + s + "]\t" + logStr);
         } catch (e) {}
     }
 }
